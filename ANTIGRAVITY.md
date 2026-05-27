@@ -104,6 +104,7 @@ com.tournament
   processing order. Read this before implementing orchestration.
 - `docs/implementation-plan.md` — phased rollout from leaf types up to the CLI,
   with explicit "definition of done" for each phase.
+- `docs/test-scenarios-plan.md` — comprehensive test strategy mapping domain edge cases and lifecycles to behavioral tests. Reference this when implementing and verifying each phase.
 
 ## Notes for implementation
 

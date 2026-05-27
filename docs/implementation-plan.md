@@ -169,11 +169,13 @@ the diagram — name it as fits) drives:
    `Tournament.status = COMPLETED`.
 
 Tests (integration, slower):
+- **Core Orchestration Requirement:** The test suite must act as a headless programmatic driver capable of conducting a whole tournament purely via the API, simulating the entire lifecycle without any CLI interaction.
+- Refer to `docs/test-scenarios-plan.md` for the comprehensive end-to-end scenarios, including disqualification walkovers, disciplinary accumulation, and tiebreakers.
 - 4-team football knockout: scripted actions → expected champion.
 - 4-team rugby round-robin: scripted actions → expected standings →
   promotion of top 2 to a knockout final → champion.
 
-**Done when:** a full tournament can be run programmatically in a test.
+**Done when:** a full tournament can be run programmatically in a test, proving the orchestration API can flawlessly manage the complete lifecycle.
 
 ---
 
