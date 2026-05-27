@@ -1,4 +1,4 @@
-# Sports Tournament Framework
+# Sports Tournament Framework — Gemini Guide
 
 A Java framework for running multi-discipline sports tournaments. The framework
 models tournament structure (stages, brackets, seeding/pairing/promotion
