@@ -1,0 +1,55 @@
+# 4-team rugby round-robin → top 2 advance to a knockout final
+new-tournament SixNations rugby
+add-stage round-robin Group 2
+add-stage knockout Final
+register Alpha
+register Bravo
+register Charlie
+register Delta
+close-registration
+publish
+start-tournament
+
+# Round-robin: home wins by a try in every match
+start-match next
+action try home 10
+finish-period
+finish-period
+
+start-match next
+action try home 10
+finish-period
+finish-period
+
+start-match next
+action try home 10
+finish-period
+finish-period
+
+start-match next
+action try home 10
+finish-period
+finish-period
+
+start-match next
+action try home 10
+finish-period
+finish-period
+
+start-match next
+action try home 10
+finish-period
+finish-period
+
+advance-stage
+show standings
+
+# Knockout final
+start-match next
+action try home 10
+action conversion home 11
+finish-period
+finish-period
+advance-stage
+show winner
+quit
