@@ -1,0 +1,28 @@
+# 4-team football knockout, scripted end-to-end
+new-tournament WorldCup football
+add-stage knockout Final
+register Eagles
+register Tigers
+register Sharks
+register Wolves
+close-registration
+publish
+start-tournament
+# Semi 1
+start-match next
+action goal home 10
+finish-period
+finish-period
+# Semi 2
+start-match next
+action goal home 10
+finish-period
+finish-period
+# Final
+start-match next
+action goal home 10
+finish-period
+finish-period
+advance-stage
+show winner
+quit
