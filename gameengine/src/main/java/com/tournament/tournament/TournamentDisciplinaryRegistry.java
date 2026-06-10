@@ -1,8 +1,8 @@
 package com.tournament.tournament;
 
-import com.tournament.competitor.InjuryRestriction;
-import com.tournament.competitor.MatchCountCondition;
-import com.tournament.competitor.Restriction;
+import com.tournament.competitor.impl.InjuryRestriction;
+import com.tournament.competitor.impl.MatchCountCondition;
+import com.tournament.competitor.api.Restriction;
 
 import java.util.HashMap;
 import java.util.Map;

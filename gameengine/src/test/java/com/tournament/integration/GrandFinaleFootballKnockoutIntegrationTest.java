@@ -1,18 +1,18 @@
 package com.tournament.integration;
 
-import com.tournament.discipline.FootballScoreType;
+import com.tournament.discipline.impl.FootballScoreType;
 import com.tournament.match.action.ScoreAction;
-import com.tournament.match.rules.FootballGameRules;
+import com.tournament.match.rules.impl.FootballGameRules;
 import com.tournament.tournament.Tournament;
 import com.tournament.tournament.TournamentMatchup;
 import com.tournament.tournament.TournamentOrchestrator;
 import com.tournament.tournament.TournamentStage;
 import com.tournament.tournament.TournamentStatus;
-import com.tournament.tournament.policy.KnockOutPairing;
-import com.tournament.tournament.policy.KnockoutProgression;
-import com.tournament.tournament.policy.NoPromotionPolicy;
-import com.tournament.tournament.policy.RandomSeedingPolicy;
-import com.tournament.tournament.policy.WalkoverFutureMatchesPolicy;
+import com.tournament.tournament.policy.impl.KnockOutPairing;
+import com.tournament.tournament.policy.impl.KnockoutProgression;
+import com.tournament.tournament.policy.impl.NoPromotionPolicy;
+import com.tournament.tournament.policy.impl.RandomSeedingPolicy;
+import com.tournament.tournament.policy.impl.WalkoverFutureMatchesPolicy;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;

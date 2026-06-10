@@ -1,19 +1,19 @@
 package com.tournament.integration;
 
-import com.tournament.competitor.Athlete;
-import com.tournament.competitor.InjuryRestriction;
-import com.tournament.competitor.MatchCountCondition;
+import com.tournament.competitor.impl.Athlete;
+import com.tournament.competitor.impl.InjuryRestriction;
+import com.tournament.competitor.impl.MatchCountCondition;
 import com.tournament.match.MatchRoster;
 import com.tournament.match.RosterEntry;
-import com.tournament.match.rules.FootballGameRules;
+import com.tournament.match.rules.impl.FootballGameRules;
 import com.tournament.tournament.Tournament;
 import com.tournament.tournament.TournamentOrchestrator;
 import com.tournament.tournament.TournamentStage;
-import com.tournament.tournament.policy.ExpungeResultsPolicy;
-import com.tournament.tournament.policy.NoPromotionPolicy;
-import com.tournament.tournament.policy.PointsTableStandings;
-import com.tournament.tournament.policy.RandomSeedingPolicy;
-import com.tournament.tournament.policy.RoundRobinPairing;
+import com.tournament.tournament.policy.impl.ExpungeResultsPolicy;
+import com.tournament.tournament.policy.impl.NoPromotionPolicy;
+import com.tournament.tournament.policy.impl.PointsTableStandings;
+import com.tournament.tournament.policy.impl.RandomSeedingPolicy;
+import com.tournament.tournament.policy.impl.RoundRobinPairing;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

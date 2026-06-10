@@ -1,6 +1,6 @@
 package com.tournament.match.rules;
 
-import com.tournament.discipline.ActionType;
+import com.tournament.discipline.api.ActionType;
 import com.tournament.match.MatchState;
 import com.tournament.match.action.DisciplinaryAction;
 import com.tournament.match.action.GameAction;

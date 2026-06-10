@@ -1,6 +1,6 @@
 package com.tournament.match.action;
 
-import com.tournament.discipline.DisciplinaryActionType;
+import com.tournament.discipline.api.DisciplinaryActionType;
 
 import java.util.Objects;
 import java.util.UUID;

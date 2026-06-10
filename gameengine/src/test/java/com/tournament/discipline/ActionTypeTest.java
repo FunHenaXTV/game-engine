@@ -7,6 +7,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import com.tournament.discipline.api.ActionType;
+import com.tournament.discipline.api.DisciplinaryActionType;
+import com.tournament.discipline.api.ScoreActionType;
+import com.tournament.discipline.api.StatisticalActionType;
+import com.tournament.discipline.impl.FootballDisciplinaryType;
+import com.tournament.discipline.impl.FootballScoreType;
+import com.tournament.discipline.impl.FootballStatisticalType;
+import com.tournament.discipline.impl.RugbyDisciplinaryType;
+import com.tournament.discipline.impl.RugbyScoreType;
+import com.tournament.discipline.impl.RugbyStatisticalType;
 
 class ActionTypeTest {
 

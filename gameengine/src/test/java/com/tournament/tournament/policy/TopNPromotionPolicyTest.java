@@ -1,7 +1,7 @@
 package com.tournament.tournament.policy;
 
-import com.tournament.competitor.Competitor;
-import com.tournament.competitor.Team;
+import com.tournament.competitor.api.Competitor;
+import com.tournament.competitor.impl.Team;
 import com.tournament.match.MatchResult;
 import com.tournament.tournament.ScoreSummary;
 import com.tournament.tournament.TournamentStage;
@@ -14,6 +14,12 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import com.tournament.tournament.policy.api.StandingsPolicy;
+import com.tournament.tournament.policy.impl.ExpungeResultsPolicy;
+import com.tournament.tournament.policy.impl.NoPromotionPolicy;
+import com.tournament.tournament.policy.impl.RandomSeedingPolicy;
+import com.tournament.tournament.policy.impl.RoundRobinPairing;
+import com.tournament.tournament.policy.impl.TopNPromotionPolicy;
 
 class TopNPromotionPolicyTest {
 

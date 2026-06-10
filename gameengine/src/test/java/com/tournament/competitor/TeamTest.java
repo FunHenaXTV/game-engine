@@ -4,6 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import com.tournament.competitor.impl.Athlete;
+import com.tournament.competitor.impl.FootballRole;
+import com.tournament.competitor.impl.InjuryRestriction;
+import com.tournament.competitor.impl.MatchCountCondition;
+import com.tournament.competitor.impl.Team;
 
 class TeamTest {
 

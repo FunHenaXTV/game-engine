@@ -1,6 +1,6 @@
 package com.tournament.match;
 
-import com.tournament.competitor.Role;
+import com.tournament.competitor.api.Role;
 import com.tournament.discipline.Discipline;
 
 import java.util.HashSet;

@@ -1,32 +1,32 @@
 package com.tournament.cli;
 
-import com.tournament.competitor.Competitor;
-import com.tournament.discipline.FootballDisciplinaryType;
-import com.tournament.discipline.FootballScoreType;
-import com.tournament.discipline.RugbyDisciplinaryType;
-import com.tournament.discipline.RugbyScoreType;
+import com.tournament.competitor.api.Competitor;
+import com.tournament.discipline.impl.FootballDisciplinaryType;
+import com.tournament.discipline.impl.FootballScoreType;
+import com.tournament.discipline.impl.RugbyDisciplinaryType;
+import com.tournament.discipline.impl.RugbyScoreType;
 import com.tournament.match.Match;
 import com.tournament.match.MatchRoster;
 import com.tournament.match.action.DisciplinaryAction;
 import com.tournament.match.action.GameAction;
 import com.tournament.match.action.ScoreAction;
-import com.tournament.match.rules.FootballGameRules;
-import com.tournament.match.rules.GameRules;
-import com.tournament.match.rules.RugbyGameRules;
+import com.tournament.match.rules.impl.FootballGameRules;
+import com.tournament.match.rules.api.GameRules;
+import com.tournament.match.rules.impl.RugbyGameRules;
 import com.tournament.tournament.ScoreSummary;
 import com.tournament.tournament.TableScoreSummary;
 import com.tournament.tournament.Tournament;
 import com.tournament.tournament.TournamentMatchup;
 import com.tournament.tournament.TournamentOrchestrator;
 import com.tournament.tournament.TournamentStage;
-import com.tournament.tournament.policy.ExpungeResultsPolicy;
-import com.tournament.tournament.policy.KnockOutPairing;
-import com.tournament.tournament.policy.KnockoutProgression;
-import com.tournament.tournament.policy.NoPromotionPolicy;
-import com.tournament.tournament.policy.PointsTableStandings;
-import com.tournament.tournament.policy.RandomSeedingPolicy;
-import com.tournament.tournament.policy.RoundRobinPairing;
-import com.tournament.tournament.policy.WalkoverFutureMatchesPolicy;
+import com.tournament.tournament.policy.impl.ExpungeResultsPolicy;
+import com.tournament.tournament.policy.impl.KnockOutPairing;
+import com.tournament.tournament.policy.impl.KnockoutProgression;
+import com.tournament.tournament.policy.impl.NoPromotionPolicy;
+import com.tournament.tournament.policy.impl.PointsTableStandings;
+import com.tournament.tournament.policy.impl.RandomSeedingPolicy;
+import com.tournament.tournament.policy.impl.RoundRobinPairing;
+import com.tournament.tournament.policy.impl.WalkoverFutureMatchesPolicy;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -161,8 +161,8 @@ public final class CommandRunner {
         requireTournament();
         String format = tokens[1];
         String name = tokens[2];
-        com.tournament.tournament.policy.PromotionPolicy promotion = tokens.length >= 4
-                ? new com.tournament.tournament.policy.TopNPromotionPolicy(Integer.parseInt(tokens[3]))
+        com.tournament.tournament.policy.api.PromotionPolicy promotion = tokens.length >= 4
+                ? new com.tournament.tournament.policy.impl.TopNPromotionPolicy(Integer.parseInt(tokens[3]))
                 : new NoPromotionPolicy();
         TournamentStage stage = switch (format) {
             case "round-robin", "round_robin", "rr" -> new TournamentStage(name, stageSeq,
@@ -474,18 +474,18 @@ public final class CommandRunner {
     private static final class Disciplines {
         static com.tournament.discipline.Discipline football() {
             return new com.tournament.discipline.Discipline("Football", 11, 23, List.of(
-                    com.tournament.competitor.FootballRole.GOALKEEPER,
-                    com.tournament.competitor.FootballRole.DEFENDER,
-                    com.tournament.competitor.FootballRole.MIDFIELDER,
-                    com.tournament.competitor.FootballRole.FORWARD));
+                    com.tournament.competitor.impl.FootballRole.GOALKEEPER,
+                    com.tournament.competitor.impl.FootballRole.DEFENDER,
+                    com.tournament.competitor.impl.FootballRole.MIDFIELDER,
+                    com.tournament.competitor.impl.FootballRole.FORWARD));
         }
 
         static com.tournament.discipline.Discipline rugby() {
             return new com.tournament.discipline.Discipline("Rugby", 15, 23, List.of(
-                    com.tournament.competitor.RugbyRole.PROP,
-                    com.tournament.competitor.RugbyRole.HOOKER,
-                    com.tournament.competitor.RugbyRole.SCRUM_HALF,
-                    com.tournament.competitor.RugbyRole.FLY_HALF));
+                    com.tournament.competitor.impl.RugbyRole.PROP,
+                    com.tournament.competitor.impl.RugbyRole.HOOKER,
+                    com.tournament.competitor.impl.RugbyRole.SCRUM_HALF,
+                    com.tournament.competitor.impl.RugbyRole.FLY_HALF));
         }
     }
 

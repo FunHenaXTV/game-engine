@@ -1,11 +1,11 @@
 package com.tournament.tournament;
 
 import com.tournament.match.MatchResult;
-import com.tournament.tournament.policy.DisqualificationResolutionPolicy;
-import com.tournament.tournament.policy.PairingPolicy;
-import com.tournament.tournament.policy.PromotionPolicy;
-import com.tournament.tournament.policy.SeedingPolicy;
-import com.tournament.tournament.policy.StandingsPolicy;
+import com.tournament.tournament.policy.api.DisqualificationResolutionPolicy;
+import com.tournament.tournament.policy.api.PairingPolicy;
+import com.tournament.tournament.policy.api.PromotionPolicy;
+import com.tournament.tournament.policy.api.SeedingPolicy;
+import com.tournament.tournament.policy.api.StandingsPolicy;
 
 import java.util.ArrayList;
 import java.util.List;

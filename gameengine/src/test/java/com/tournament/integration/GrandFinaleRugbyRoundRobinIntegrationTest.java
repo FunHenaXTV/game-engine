@@ -1,21 +1,21 @@
 package com.tournament.integration;
 
-import com.tournament.discipline.RugbyScoreType;
+import com.tournament.discipline.impl.RugbyScoreType;
 import com.tournament.match.action.ScoreAction;
-import com.tournament.match.rules.RugbyGameRules;
+import com.tournament.match.rules.impl.RugbyGameRules;
 import com.tournament.tournament.Tournament;
 import com.tournament.tournament.TournamentMatchup;
 import com.tournament.tournament.TournamentOrchestrator;
 import com.tournament.tournament.TournamentStage;
 import com.tournament.tournament.TournamentStatus;
-import com.tournament.tournament.policy.KnockOutPairing;
-import com.tournament.tournament.policy.KnockoutProgression;
-import com.tournament.tournament.policy.NoPromotionPolicy;
-import com.tournament.tournament.policy.PointsTableStandings;
-import com.tournament.tournament.policy.RandomSeedingPolicy;
-import com.tournament.tournament.policy.RoundRobinPairing;
-import com.tournament.tournament.policy.TopNPromotionPolicy;
-import com.tournament.tournament.policy.WalkoverFutureMatchesPolicy;
+import com.tournament.tournament.policy.impl.KnockOutPairing;
+import com.tournament.tournament.policy.impl.KnockoutProgression;
+import com.tournament.tournament.policy.impl.NoPromotionPolicy;
+import com.tournament.tournament.policy.impl.PointsTableStandings;
+import com.tournament.tournament.policy.impl.RandomSeedingPolicy;
+import com.tournament.tournament.policy.impl.RoundRobinPairing;
+import com.tournament.tournament.policy.impl.TopNPromotionPolicy;
+import com.tournament.tournament.policy.impl.WalkoverFutureMatchesPolicy;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;

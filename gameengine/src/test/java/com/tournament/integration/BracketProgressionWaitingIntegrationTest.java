@@ -1,9 +1,9 @@
 package com.tournament.integration;
 
-import com.tournament.competitor.Team;
+import com.tournament.competitor.impl.Team;
 import com.tournament.tournament.MatchupStatus;
 import com.tournament.tournament.TournamentMatchup;
-import com.tournament.tournament.policy.KnockOutPairing;
+import com.tournament.tournament.policy.impl.KnockOutPairing;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -14,7 +14,7 @@ class BracketProgressionWaitingIntegrationTest {
 
     @Test
     void semiStaysWaitingUntilBothFeedersComplete() {
-        List<com.tournament.competitor.Competitor> seeded = List.of(
+        List<com.tournament.competitor.api.Competitor> seeded = List.of(
                 new Team("A"), new Team("B"), new Team("C"), new Team("D"));
 
         List<TournamentMatchup> bracket = new KnockOutPairing().generatePairings(seeded);
