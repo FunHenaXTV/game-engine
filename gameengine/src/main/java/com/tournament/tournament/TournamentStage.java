@@ -19,11 +19,11 @@ public final class TournamentStage {
     private final UUID id = UUID.randomUUID();
     private final String name;
     private final int sequenceNumber;
-    private final SeedingPolicy seedingPolicy;
-    private final PairingPolicy pairingPolicy;
-    private final StandingsPolicy standingsPolicy;
-    private final PromotionPolicy promotionPolicy;
-    private final DisqualificationResolutionPolicy disqualificationPolicy;
+    private SeedingPolicy seedingPolicy;
+    private PairingPolicy pairingPolicy;
+    private StandingsPolicy standingsPolicy;
+    private PromotionPolicy promotionPolicy;
+    private DisqualificationResolutionPolicy disqualificationPolicy;
     private final List<TournamentMatchup> matchups = new ArrayList<>();
 
     private TournamentStageStatus status = TournamentStageStatus.PLANNED;
@@ -81,6 +81,31 @@ public final class TournamentStage {
 
     public DisqualificationResolutionPolicy getDisqualificationPolicy() {
         return disqualificationPolicy;
+    }
+
+    public void setSeedingPolicy(SeedingPolicy seedingPolicy) {
+        if (status != TournamentStageStatus.PLANNED) throw new IllegalStateException("can only set policy in PLANNED state");
+        this.seedingPolicy = Objects.requireNonNull(seedingPolicy, "seedingPolicy");
+    }
+
+    public void setPairingPolicy(PairingPolicy pairingPolicy) {
+        if (status != TournamentStageStatus.PLANNED) throw new IllegalStateException("can only set policy in PLANNED state");
+        this.pairingPolicy = Objects.requireNonNull(pairingPolicy, "pairingPolicy");
+    }
+
+    public void setStandingsPolicy(StandingsPolicy standingsPolicy) {
+        if (status != TournamentStageStatus.PLANNED) throw new IllegalStateException("can only set policy in PLANNED state");
+        this.standingsPolicy = Objects.requireNonNull(standingsPolicy, "standingsPolicy");
+    }
+
+    public void setPromotionPolicy(PromotionPolicy promotionPolicy) {
+        if (status != TournamentStageStatus.PLANNED) throw new IllegalStateException("can only set policy in PLANNED state");
+        this.promotionPolicy = Objects.requireNonNull(promotionPolicy, "promotionPolicy");
+    }
+
+    public void setDisqualificationPolicy(DisqualificationResolutionPolicy disqualificationPolicy) {
+        if (status != TournamentStageStatus.PLANNED) throw new IllegalStateException("can only set policy in PLANNED state");
+        this.disqualificationPolicy = Objects.requireNonNull(disqualificationPolicy, "disqualificationPolicy");
     }
 
     public List<TournamentMatchup> getMatchups() {
