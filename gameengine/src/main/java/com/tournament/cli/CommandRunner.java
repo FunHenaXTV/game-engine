@@ -1,10 +1,16 @@
 package com.tournament.cli;
 
-import com.tournament.competitor.api.Competitor;
-import com.tournament.discipline.impl.FootballDisciplinaryType;
-import com.tournament.discipline.impl.FootballScoreType;
-import com.tournament.discipline.impl.RugbyDisciplinaryType;
-import com.tournament.discipline.impl.RugbyScoreType;
+import com.tournament.competitor.Team;
+import com.tournament.competitor.Role;
+import com.tournament.competitor.Athlete;
+import com.tournament.competitor.RugbyRole;
+import com.tournament.competitor.FootballRole;
+import com.tournament.competitor.TeamMember;
+import com.tournament.competitor.Competitor;
+import com.tournament.discipline.FootballDisciplinaryType;
+import com.tournament.discipline.FootballScoreType;
+import com.tournament.discipline.RugbyDisciplinaryType;
+import com.tournament.discipline.RugbyScoreType;
 import com.tournament.match.Match;
 import com.tournament.match.MatchRoster;
 import com.tournament.match.action.DisciplinaryAction;
@@ -56,7 +62,8 @@ public final class CommandRunner {
     }
 
     /**
-     * Run commands from a reader without prompting; returns false on the first error.
+     * Run commands from a reader without prompting; returns false on the first
+     * error.
      * 'quit' / 'exit' stops processing without being treated as an error.
      */
     public boolean runScript(BufferedReader reader) throws IOException {
@@ -98,7 +105,8 @@ public final class CommandRunner {
     }
 
     /**
-     * Returns true if the runner should continue; false to abort (used by script mode).
+     * Returns true if the runner should continue; false to abort (used by script
+     * mode).
      */
     public boolean execute(String line) {
         String[] tokens = line.split("\\s+");
@@ -124,8 +132,12 @@ public final class CommandRunner {
             case "finish-period" -> finishPeriod();
             case "advance-stage" -> advanceStage();
             case "show" -> show(tokens);
+            case "create-team" -> createTeam(tokens);
+            case "add-player" -> addPlayer(tokens);
             case "help" -> help();
-            case "quit", "exit" -> { return false; }
+            case "quit", "exit" -> {
+                return false;
+            }
             default -> throw new IllegalArgumentException("unknown command: " + cmd);
         }
         return true;
@@ -183,15 +195,70 @@ public final class CommandRunner {
         requireArgs(tokens, 2, "register <competitor-name>");
         requireTournament();
         String name = tokens[1];
-        if (teams.containsKey(name)) {
-            throw new IllegalArgumentException("team already registered: " + name);
+
+        TeamBuilder.CliTeam ct = teams.get(name);
+        if (ct != null) {
+            if (tournament.getRegistration().getCompetitors().contains(ct.team())) {
+                throw new IllegalArgumentException("team already registered: " + name);
+            }
+            tournament.getRegistration().enroll(ct.team());
+            out.println("registered manually created team: " + name + " id=" + shortener.shorten(ct.team().getId()));
+        } else {
+            ct = "rugby".equals(disciplineName)
+                    ? TeamBuilder.buildRugby(name)
+                    : TeamBuilder.buildFootball(name);
+            teams.put(name, ct);
+            tournament.getRegistration().enroll(ct.team());
+            out.println("registered auto-generated team: " + name + " id=" + shortener.shorten(ct.team().getId()));
         }
-        TeamBuilder.CliTeam ct = "rugby".equals(disciplineName)
-                ? TeamBuilder.buildRugby(name)
-                : TeamBuilder.buildFootball(name);
+    }
+
+    private void createTeam(String[] tokens) {
+        requireArgs(tokens, 2, "create-team <team-name>");
+        requireTournament();
+        String name = tokens[1];
+        if (teams.containsKey(name)) {
+            throw new IllegalArgumentException("team already exists: " + name);
+        }
+        Team team = new Team(name);
+        TeamBuilder.CliTeam ct = new TeamBuilder.CliTeam(team, new java.util.ArrayList<>(), new java.util.ArrayList<>(),
+                "rugby".equals(disciplineName) ? 15 : 11);
         teams.put(name, ct);
-        tournament.getRegistration().enroll(ct.team());
-        out.println("registered: " + name + " id=" + shortener.shorten(ct.team().getId()));
+        out.println("team created: " + name);
+    }
+
+    private void addPlayer(String[] tokens) {
+        requireArgs(tokens, 5, "add-player <team-name> <player-name> <role> <shirt-number>");
+        String teamName = tokens[1];
+        String playerName = tokens[2];
+        String roleStr = tokens[3];
+        int shirt = Integer.parseInt(tokens[4]);
+
+        TeamBuilder.CliTeam ct = teams.get(teamName);
+        if (ct == null)
+            throw new IllegalArgumentException("team not found: " + teamName);
+
+        Role role = parseRole(roleStr);
+
+        Athlete athlete = new Athlete(playerName);
+        ct.athletes().add(athlete);
+        ct.team().addMember(TeamMember.of(athlete, role));
+        ct.entries().add(new com.tournament.match.RosterEntry(athlete.getId(), role.name(), shirt));
+
+        if (orchestrator != null) {
+            orchestrator.registerAthlete(athlete);
+        }
+
+        out.println("added player: " + playerName + " to " + teamName + " as " + role.name() + " (#" + shirt + ")");
+    }
+
+    private Role parseRole(String roleStr) {
+        String u = roleStr.toUpperCase();
+        if ("rugby".equals(disciplineName)) {
+            return RugbyRole.valueOf(u);
+        } else {
+            return FootballRole.valueOf(u);
+        }
     }
 
     private void closeRegistration() {
@@ -276,23 +343,28 @@ public final class CommandRunner {
         boolean rugby = "rugby".equals(disciplineName);
         return switch (t) {
             case "goal" -> {
-                if (rugby) throw new IllegalArgumentException("goal is football-only");
+                if (rugby)
+                    throw new IllegalArgumentException("goal is football-only");
                 yield ScoreAction.of(competitorId, playerId, minute, FootballScoreType.GOAL);
             }
             case "try" -> {
-                if (!rugby) throw new IllegalArgumentException("try is rugby-only");
+                if (!rugby)
+                    throw new IllegalArgumentException("try is rugby-only");
                 yield ScoreAction.of(competitorId, playerId, minute, RugbyScoreType.TRY);
             }
             case "conversion" -> {
-                if (!rugby) throw new IllegalArgumentException("conversion is rugby-only");
+                if (!rugby)
+                    throw new IllegalArgumentException("conversion is rugby-only");
                 yield ScoreAction.of(competitorId, playerId, minute, RugbyScoreType.CONVERSION);
             }
             case "penalty" -> {
-                if (!rugby) throw new IllegalArgumentException("penalty is rugby-only");
+                if (!rugby)
+                    throw new IllegalArgumentException("penalty is rugby-only");
                 yield ScoreAction.of(competitorId, playerId, minute, RugbyScoreType.PENALTY_KICK);
             }
             case "drop-goal" -> {
-                if (!rugby) throw new IllegalArgumentException("drop-goal is rugby-only");
+                if (!rugby)
+                    throw new IllegalArgumentException("drop-goal is rugby-only");
                 yield ScoreAction.of(competitorId, playerId, minute, RugbyScoreType.DROP_GOAL);
             }
             case "yellow" -> rugby
@@ -395,6 +467,8 @@ public final class CommandRunner {
         out.println("  new-tournament <name> <football|rugby>");
         out.println("  add-stage <round-robin|knockout> <name> [promote-N]");
         out.println("  register <competitor-name>");
+        out.println("  create-team <team-name>");
+        out.println("  add-player <team-name> <player-name> <role> <shirt-number>");
         out.println("  close-registration");
         out.println("  publish");
         out.println("  start-tournament");
@@ -437,14 +511,16 @@ public final class CommandRunner {
 
     private Competitor competitorById(UUID id) {
         for (Competitor c : tournament.getRegistration().getCompetitors()) {
-            if (c.getId().equals(id)) return c;
+            if (c.getId().equals(id))
+                return c;
         }
         throw new IllegalArgumentException("unknown competitor: " + id);
     }
 
     private String nameOf(UUID id) {
         for (Competitor c : tournament.getRegistration().getCompetitors()) {
-            if (c.getId().equals(id)) return c.getName();
+            if (c.getId().equals(id))
+                return c.getName();
         }
         return id.toString();
     }
@@ -460,13 +536,15 @@ public final class CommandRunner {
             return currentMatchup.getParticipants().get(1);
         }
         TeamBuilder.CliTeam ct = teams.get(token);
-        if (ct != null) return ct.team().getId();
+        if (ct != null)
+            return ct.team().getId();
         throw new IllegalArgumentException("unknown side: " + token);
     }
 
     private TeamBuilder.CliTeam teamByCompetitor(UUID competitorId) {
         for (TeamBuilder.CliTeam ct : teams.values()) {
-            if (ct.team().getId().equals(competitorId)) return ct;
+            if (ct.team().getId().equals(competitorId))
+                return ct;
         }
         throw new IllegalArgumentException("no team for competitor " + competitorId);
     }

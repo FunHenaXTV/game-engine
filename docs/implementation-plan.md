@@ -188,6 +188,8 @@ orchestrator. Suggested commands:
 new-tournament <name> <football|rugby>
 add-stage <round-robin|knockout> <stage-name>
 register <competitor-name>
+create-team <team-name>
+add-player <team-name> <player-name> <role> <shirt-number>
 close-registration
 publish
 start-match <matchup-id>
