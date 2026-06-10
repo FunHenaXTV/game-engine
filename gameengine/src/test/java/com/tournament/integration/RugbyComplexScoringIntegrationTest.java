@@ -1,10 +1,10 @@
 package com.tournament.integration;
 
-import com.tournament.discipline.RugbyScoreType;
+import com.tournament.discipline.impl.RugbyScoreType;
 import com.tournament.match.Match;
 import com.tournament.match.MatchRoster;
 import com.tournament.match.action.ScoreAction;
-import com.tournament.match.rules.RugbyGameRules;
+import com.tournament.match.rules.impl.RugbyGameRules;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -20,7 +20,7 @@ class RugbyComplexScoringIntegrationTest {
     void tryFollowedByConversionScoresSeven() {
         Fixtures.TeamFixture a = Fixtures.rugbyTeam("Lions");
         Fixtures.TeamFixture b = Fixtures.rugbyTeam("Bears");
-        Map<UUID, com.tournament.competitor.Athlete> all = new HashMap<>();
+        Map<UUID, com.tournament.competitor.impl.Athlete> all = new HashMap<>();
         a.athletes().forEach(at -> all.put(at.getId(), at));
         b.athletes().forEach(at -> all.put(at.getId(), at));
 
@@ -40,7 +40,7 @@ class RugbyComplexScoringIntegrationTest {
     void conversionWithoutTryViolatesInvariant() {
         Fixtures.TeamFixture a = Fixtures.rugbyTeam("Lions");
         Fixtures.TeamFixture b = Fixtures.rugbyTeam("Bears");
-        Map<UUID, com.tournament.competitor.Athlete> all = new HashMap<>();
+        Map<UUID, com.tournament.competitor.impl.Athlete> all = new HashMap<>();
         a.athletes().forEach(at -> all.put(at.getId(), at));
         b.athletes().forEach(at -> all.put(at.getId(), at));
 

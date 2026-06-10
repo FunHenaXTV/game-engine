@@ -1,6 +1,6 @@
 package com.tournament.tournament;
 
-import com.tournament.competitor.Team;
+import com.tournament.competitor.impl.Team;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

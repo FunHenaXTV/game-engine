@@ -58,6 +58,14 @@ This document is the **single source of truth** for all architectural and design
 
 ---
 
+## 7. `api` / `impl` Sub-Package Split for Open Hierarchies
+* **UML / PDF Specification:** The suggested package layout groups each domain concern into a single flat package (e.g. all of `competitor`, all of `tournament.policy`), mixing interfaces and their implementations together.
+* **Previous Approach / Issue:** Interfaces and their concrete implementations lived side by side in the same package, which made it harder to navigate the extension points (contracts) versus the discipline-specific implementations.
+* **Why it didn't work / Limitations:** As the policy, role, restriction and action-type hierarchies grew, a flat package made it hard to see at a glance which types are the stable contracts to implement against and which are swappable implementations. A naive "split everything into `api`/`impl`" is impossible for `sealed` hierarchies: with no `module-info.java` the project is in the unnamed module, where a `sealed` interface and its `permits` subtypes **must** reside in the same package.
+* **What was changed & Why:** Open (plain `interface`) hierarchies were split into `api/` (interfaces) and `impl/` (implementations) sub-packages: `competitor`, `discipline`, `match.rules` (`GameRules`), and `tournament.policy`. Value objects, aggregates, status enums and orchestration helpers stay at the package root. Closed (`sealed`) hierarchies — `MatchResult`, `GameAction`, `StageTerminationRule`, `ScoreSummary` — were deliberately **kept intact** in a single package to satisfy the unnamed-module sealing constraint. This aligns the physical layout with the project's open/closed distinction (open = extensible `api`/`impl`, closed = cohesive cluster) and keeps disciplines addable without touching core contracts. No behavior changed; all 138 tests pass.
+
+---
+
 ## Template for New Deviations
 When adding any new deviation, please copy and paste this template at the bottom of the document and fill it out:
 

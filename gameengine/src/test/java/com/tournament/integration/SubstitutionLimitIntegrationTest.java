@@ -4,7 +4,7 @@ import com.tournament.match.Match;
 import com.tournament.match.MatchRoster;
 import com.tournament.match.RosterEntry;
 import com.tournament.match.action.SubstitutionAction;
-import com.tournament.match.rules.FootballGameRules;
+import com.tournament.match.rules.impl.FootballGameRules;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -21,7 +21,7 @@ class SubstitutionLimitIntegrationTest {
     void fourthSubstitutionRejectedAndRosterPreserved() {
         Fixtures.TeamFixture a = Fixtures.footballTeam("Eagles");
         Fixtures.TeamFixture b = Fixtures.footballTeam("Tigers");
-        Map<UUID, com.tournament.competitor.Athlete> all = new HashMap<>();
+        Map<UUID, com.tournament.competitor.impl.Athlete> all = new HashMap<>();
         a.athletes().forEach(at -> all.put(at.getId(), at));
         b.athletes().forEach(at -> all.put(at.getId(), at));
 

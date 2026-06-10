@@ -3,6 +3,9 @@ package com.tournament.competitor;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import com.tournament.competitor.impl.Athlete;
+import com.tournament.competitor.impl.InjuryRestriction;
+import com.tournament.competitor.impl.MatchCountCondition;
 
 class AthleteTest {
 

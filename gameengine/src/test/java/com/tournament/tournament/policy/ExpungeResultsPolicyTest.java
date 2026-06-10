@@ -1,7 +1,7 @@
 package com.tournament.tournament.policy;
 
-import com.tournament.competitor.Competitor;
-import com.tournament.competitor.Team;
+import com.tournament.competitor.api.Competitor;
+import com.tournament.competitor.impl.Team;
 import com.tournament.match.PointsMatchResult;
 import com.tournament.tournament.TournamentStage;
 import org.junit.jupiter.api.Test;
@@ -12,6 +12,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import com.tournament.tournament.policy.impl.ExpungeResultsPolicy;
+import com.tournament.tournament.policy.impl.NoPromotionPolicy;
+import com.tournament.tournament.policy.impl.PointsTableStandings;
+import com.tournament.tournament.policy.impl.RandomSeedingPolicy;
+import com.tournament.tournament.policy.impl.RoundRobinPairing;
 
 class ExpungeResultsPolicyTest {
 

@@ -1,10 +1,10 @@
 package com.tournament.match.rules;
 
-import com.tournament.competitor.Athlete;
-import com.tournament.competitor.FootballRole;
+import com.tournament.competitor.impl.Athlete;
+import com.tournament.competitor.impl.FootballRole;
 import com.tournament.discipline.Discipline;
-import com.tournament.discipline.FootballDisciplinaryType;
-import com.tournament.discipline.FootballScoreType;
+import com.tournament.discipline.impl.FootballDisciplinaryType;
+import com.tournament.discipline.impl.FootballScoreType;
 import com.tournament.match.Match;
 import com.tournament.match.MatchRoster;
 import com.tournament.match.MatchStatus;
@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import com.tournament.match.rules.impl.FootballGameRules;
 
 class FootballGameRulesTest {
 

@@ -1,6 +1,6 @@
 package com.tournament.tournament;
 
-import com.tournament.competitor.Competitor;
+import com.tournament.competitor.api.Competitor;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

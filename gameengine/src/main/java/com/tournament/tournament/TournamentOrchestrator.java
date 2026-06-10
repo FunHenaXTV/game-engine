@@ -1,12 +1,10 @@
 package com.tournament.tournament;
 
-import com.tournament.competitor.Athlete;
-import com.tournament.competitor.ExpirationCondition;
-import com.tournament.competitor.InjuryRestriction;
-import com.tournament.competitor.MatchCountCondition;
-import com.tournament.competitor.Restriction;
-import com.tournament.discipline.FootballDisciplinaryType;
-import com.tournament.discipline.RugbyDisciplinaryType;
+import com.tournament.competitor.impl.Athlete;
+import com.tournament.competitor.api.ExpirationCondition;
+import com.tournament.competitor.impl.InjuryRestriction;
+import com.tournament.competitor.impl.MatchCountCondition;
+import com.tournament.competitor.api.Restriction;
 import com.tournament.match.Match;
 import com.tournament.match.MatchEligibilityChecker;
 import com.tournament.match.MatchResult;
@@ -14,7 +12,7 @@ import com.tournament.match.MatchRoster;
 import com.tournament.match.MatchStatus;
 import com.tournament.match.action.DisciplinaryAction;
 import com.tournament.match.action.GameAction;
-import com.tournament.match.rules.GameRules;
+import com.tournament.match.rules.api.GameRules;
 import com.tournament.tournament.policy.StageInitializer;
 
 import java.util.ArrayList;
@@ -167,7 +165,7 @@ public final class TournamentOrchestrator {
             tournament.markCompleted(result);
             return false;
         }
-        List<com.tournament.competitor.Competitor> promoted = current.getPromotionPolicy().getPromoted(current);
+        List<com.tournament.competitor.api.Competitor> promoted = current.getPromotionPolicy().getPromoted(current);
         TournamentStage next = stages.get(nextIndex);
         StageInitializer.prepareStage(next, promoted);
         tournament.markStageActive(nextIndex);
@@ -180,7 +178,7 @@ public final class TournamentOrchestrator {
     }
 
     private TournamentResult buildResult(TournamentStage finalStage) {
-        List<com.tournament.competitor.Competitor> ranking =
+        List<com.tournament.competitor.api.Competitor> ranking =
                 finalStage.getStandingsPolicy().getRankedCompetitors();
         List<UUID> rankingIds = new ArrayList<>();
         for (var c : ranking) {
@@ -204,13 +202,12 @@ public final class TournamentOrchestrator {
         if (!(action instanceof DisciplinaryAction d)) {
             return;
         }
-        boolean yellow = d.actionType() == FootballDisciplinaryType.YELLOW_CARD
-                || d.actionType() == RugbyDisciplinaryType.YELLOW_CARD;
-        if (!yellow) {
+        int penaltyPoints = d.actionType().penaltyPoints();
+        if (penaltyPoints <= 0) {
             return;
         }
         Optional<Restriction> created = tournament.getDisciplinaryRegistry()
-                .addPenaltyPoints(d.playerId(), 1);
+                .addPenaltyPoints(d.playerId(), penaltyPoints);
         created.ifPresent(restriction -> {
             Athlete a = athletes.get(d.playerId());
             if (a != null) {

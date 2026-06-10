@@ -1,6 +1,6 @@
 package com.tournament.discipline;
 
-import com.tournament.competitor.Role;
+import com.tournament.competitor.api.Role;
 
 import java.util.List;
 import java.util.Objects;

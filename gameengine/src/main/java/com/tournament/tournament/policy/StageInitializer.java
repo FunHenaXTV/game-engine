@@ -1,6 +1,6 @@
 package com.tournament.tournament.policy;
 
-import com.tournament.competitor.Competitor;
+import com.tournament.competitor.api.Competitor;
 import com.tournament.tournament.TournamentMatchup;
 import com.tournament.tournament.TournamentStage;
 
