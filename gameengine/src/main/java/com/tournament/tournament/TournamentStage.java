@@ -181,7 +181,7 @@ public final class TournamentStage {
     public boolean isComplete() {
         for (TournamentMatchup m : matchups) {
             MatchupStatus s = m.getStatus();
-            if (s != MatchupStatus.COMPLETED && s != MatchupStatus.WALKOVER) {
+            if (s != MatchupStatus.COMPLETED && s != MatchupStatus.WALKOVER && s != MatchupStatus.CANCELLED) {
                 return false;
             }
         }
