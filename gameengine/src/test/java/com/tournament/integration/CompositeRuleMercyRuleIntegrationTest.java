@@ -1,12 +1,12 @@
 package com.tournament.integration;
 
-import com.tournament.discipline.FootballScoreType;
+import com.tournament.discipline.impl.FootballScoreType;
 import com.tournament.match.Match;
 import com.tournament.match.MatchStage;
 import com.tournament.match.MatchStageStatus;
 import com.tournament.match.action.ScoreAction;
 import com.tournament.match.rules.CompositeRule;
-import com.tournament.match.rules.GameRules;
+import com.tournament.match.rules.api.GameRules;
 import com.tournament.match.rules.LogicalOperator;
 import com.tournament.match.rules.MatchScoreBasedRule;
 import com.tournament.match.rules.TimeBasedRule;
@@ -27,7 +27,7 @@ class CompositeRuleMercyRuleIntegrationTest {
     void mercyRuleEndsPeriodBeforeTimeExpires() {
         Fixtures.TeamFixture a = Fixtures.footballTeam("Crushers");
         Fixtures.TeamFixture b = Fixtures.footballTeam("Underdogs");
-        Map<UUID, com.tournament.competitor.Athlete> all = new HashMap<>();
+        Map<UUID, com.tournament.competitor.impl.Athlete> all = new HashMap<>();
         a.athletes().forEach(at -> all.put(at.getId(), at));
         b.athletes().forEach(at -> all.put(at.getId(), at));
 
@@ -48,8 +48,8 @@ class CompositeRuleMercyRuleIntegrationTest {
     }
 
     static final class MercyFootballRules implements GameRules {
-        private final com.tournament.match.rules.FootballGameRules delegate =
-                new com.tournament.match.rules.FootballGameRules();
+        private final com.tournament.match.rules.impl.FootballGameRules delegate =
+                new com.tournament.match.rules.impl.FootballGameRules();
 
         @Override
         public List<MatchStage> generatePeriods() {

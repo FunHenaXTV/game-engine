@@ -1,7 +1,7 @@
 package com.tournament.tournament.policy;
 
-import com.tournament.competitor.Competitor;
-import com.tournament.competitor.Team;
+import com.tournament.competitor.api.Competitor;
+import com.tournament.competitor.impl.Team;
 import com.tournament.tournament.MatchupStatus;
 import com.tournament.tournament.TournamentMatchup;
 import com.tournament.tournament.TournamentStage;
@@ -11,6 +11,11 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import com.tournament.tournament.policy.impl.KnockOutPairing;
+import com.tournament.tournament.policy.impl.NoPromotionPolicy;
+import com.tournament.tournament.policy.impl.PointsTableStandings;
+import com.tournament.tournament.policy.impl.RandomSeedingPolicy;
+import com.tournament.tournament.policy.impl.WalkoverFutureMatchesPolicy;
 
 class WalkoverFutureMatchesPolicyTest {
 

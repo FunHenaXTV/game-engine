@@ -1,7 +1,7 @@
 package com.tournament.discipline;
 
-import com.tournament.competitor.FootballRole;
-import com.tournament.competitor.Role;
+import com.tournament.competitor.impl.FootballRole;
+import com.tournament.competitor.api.Role;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

@@ -2,6 +2,8 @@ package com.tournament.competitor;
 
 import java.util.Objects;
 import java.util.UUID;
+import com.tournament.competitor.api.Role;
+import com.tournament.competitor.impl.Athlete;
 
 public record TeamMember(UUID id, Athlete athlete, Role role) {
 

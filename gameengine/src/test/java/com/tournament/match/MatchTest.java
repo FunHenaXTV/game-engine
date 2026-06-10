@@ -1,11 +1,11 @@
 package com.tournament.match;
 
-import com.tournament.competitor.Athlete;
-import com.tournament.competitor.FootballRole;
+import com.tournament.competitor.impl.Athlete;
+import com.tournament.competitor.impl.FootballRole;
 import com.tournament.discipline.Discipline;
-import com.tournament.discipline.FootballScoreType;
+import com.tournament.discipline.impl.FootballScoreType;
 import com.tournament.match.action.ScoreAction;
-import com.tournament.match.rules.NoOpGameRules;
+import com.tournament.match.rules.impl.NoOpGameRules;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;

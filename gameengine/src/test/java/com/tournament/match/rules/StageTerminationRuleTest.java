@@ -1,6 +1,6 @@
 package com.tournament.match.rules;
 
-import com.tournament.discipline.FootballScoreType;
+import com.tournament.discipline.impl.FootballScoreType;
 import com.tournament.match.MatchState;
 import com.tournament.match.action.GameAction;
 import com.tournament.match.action.ScoreAction;

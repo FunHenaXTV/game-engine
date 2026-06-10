@@ -1,6 +1,6 @@
 package com.tournament.tournament;
 
-import com.tournament.competitor.Restriction;
+import com.tournament.competitor.api.Restriction;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;

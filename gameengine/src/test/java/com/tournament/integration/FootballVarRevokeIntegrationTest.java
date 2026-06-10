@@ -1,11 +1,11 @@
 package com.tournament.integration;
 
-import com.tournament.discipline.FootballScoreType;
+import com.tournament.discipline.impl.FootballScoreType;
 import com.tournament.match.Match;
 import com.tournament.match.action.GameAction;
 import com.tournament.match.action.RevokeAction;
 import com.tournament.match.action.ScoreAction;
-import com.tournament.match.rules.FootballGameRules;
+import com.tournament.match.rules.impl.FootballGameRules;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -20,7 +20,7 @@ class FootballVarRevokeIntegrationTest {
     void revokeReversesGoalAndPreservesActionHistory() {
         Fixtures.TeamFixture a = Fixtures.footballTeam("Eagles");
         Fixtures.TeamFixture b = Fixtures.footballTeam("Tigers");
-        Map<UUID, com.tournament.competitor.Athlete> all = new HashMap<>();
+        Map<UUID, com.tournament.competitor.impl.Athlete> all = new HashMap<>();
         a.athletes().forEach(at -> all.put(at.getId(), at));
         b.athletes().forEach(at -> all.put(at.getId(), at));
 

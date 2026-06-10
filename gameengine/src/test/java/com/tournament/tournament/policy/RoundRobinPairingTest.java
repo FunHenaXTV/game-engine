@@ -1,7 +1,7 @@
 package com.tournament.tournament.policy;
 
-import com.tournament.competitor.Competitor;
-import com.tournament.competitor.Team;
+import com.tournament.competitor.api.Competitor;
+import com.tournament.competitor.impl.Team;
 import com.tournament.tournament.MatchupStatus;
 import com.tournament.tournament.TournamentMatchup;
 import org.junit.jupiter.api.Test;
@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import com.tournament.tournament.policy.impl.RoundRobinPairing;
 
 class RoundRobinPairingTest {
 

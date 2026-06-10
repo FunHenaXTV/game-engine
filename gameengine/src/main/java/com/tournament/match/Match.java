@@ -1,9 +1,9 @@
 package com.tournament.match;
 
-import com.tournament.competitor.Athlete;
+import com.tournament.competitor.impl.Athlete;
 import com.tournament.discipline.Discipline;
 import com.tournament.match.action.GameAction;
-import com.tournament.match.rules.GameRules;
+import com.tournament.match.rules.api.GameRules;
 
 import java.util.ArrayList;
 import java.util.HashMap;

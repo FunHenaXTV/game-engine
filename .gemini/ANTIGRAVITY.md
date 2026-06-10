@@ -50,20 +50,35 @@ docker run --rm -v "$PWD/gameengine:/workspace/gameengine" game-engine-test \
 
 ## Suggested package layout
 
+Open (plain `interface`) hierarchies are split into `api/` (the interfaces) and
+`impl/` (their implementations) sub-packages for easier navigation. Closed
+(`sealed`) hierarchies are **not** split: in the unnamed module a sealed type and
+its `permits` subtypes must share a package, so they stay together as a cohesive
+cluster (see deviation #7 in `docs/model-deviations.md`).
+
 ```
 com.tournament
-├── competitor        # Athlete, Team, TeamMember, Role, Restriction, ExpirationCondition
-├── discipline        # Discipline, FootballGameRules, RugbyGameRules, role/action-type enums
-├── match             # Match, MatchRoster, RosterEntry, MatchState, MatchStage,
-│                     # MatchResult, MatchEligibilityChecker
-├── match.action      # GameAction hierarchy + ActionType interfaces
-├── match.rules       # StageTerminationRule hierarchy, GameRules interface
-├── tournament        # Tournament, TournamentStage, TournamentMatchup,
-│                     # TournamentRegistration, TournamentResult,
-│                     # TournamentDisciplinaryRegistry
-├── tournament.policy # SeedingPolicy, PairingPolicy, StandingsPolicy,
-│                     # PromotionPolicy, DisqualificationResolutionPolicy + impls
-└── cli               # entry point + command parsing
+├── competitor            # TeamMember (value object)
+│   ├── api               #   Competitor, Role, Restriction, ExpirationCondition
+│   └── impl              #   Athlete, Team, Football/RugbyRole, InjuryRestriction,
+│                         #   MatchCountCondition, TimeBasedCondition
+├── discipline            # Discipline
+│   ├── api               #   ActionType (+ Score/Statistical/Disciplinary sub-interfaces)
+│   └── impl              #   Football/Rugby score/statistical/disciplinary enums
+├── match                 # Match, MatchRoster, RosterEntry, MatchState, MatchStage,
+│                         # MatchEligibilityChecker, MatchResult+PointsMatchResult (sealed)
+├── match.action          # GameAction sealed hierarchy (interface + records, kept together)
+├── match.rules           # StageTerminationRule sealed hierarchy, LogicalOperator
+│   ├── api               #   GameRules
+│   └── impl              #   FootballGameRules, RugbyGameRules, NoOpGameRules
+├── tournament            # Tournament, TournamentStage, TournamentMatchup, registries,
+│                         # ScoreSummary + impls (sealed, kept together)
+├── tournament.policy     # StageInitializer (orchestration helper)
+│   ├── api               #   SeedingPolicy, PairingPolicy, StandingsPolicy,
+│   │                     #   PromotionPolicy, DisqualificationResolutionPolicy
+│   └── impl              #   RandomSeedingPolicy, RoundRobin/KnockOut pairing,
+│                         #   PointsTableStandings, TopN/NoPromotion, walkover/expunge
+└── cli                   # entry point + command parsing
 ```
 
 ## Conventions
