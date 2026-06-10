@@ -26,6 +26,11 @@ public record CompositeRule(LogicalOperator operator, List<StageTerminationRule>
         };
     }
 
+    @Override
+    public boolean terminatesMatch(MatchState state) {
+        return rules.stream().anyMatch(r -> r.terminatesMatch(state));
+    }
+
     public static Builder builder() {
         return new Builder();
     }

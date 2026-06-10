@@ -57,4 +57,44 @@ class MatchStageTest {
         assertThatThrownBy(stage::start)
                 .isInstanceOf(IllegalStateException.class);
     }
+
+    @Test
+    void terminateFromPlanned() {
+        MatchStage stage = new MatchStage("half", new TimeBasedRule(45), 45);
+
+        stage.terminate();
+
+        assertThat(stage.getStatus()).isEqualTo(MatchStageStatus.TERMINATED);
+    }
+
+    @Test
+    void terminateFromActive() {
+        MatchStage stage = new MatchStage("half", new TimeBasedRule(45), 45);
+        stage.start();
+
+        stage.terminate();
+
+        assertThat(stage.getStatus()).isEqualTo(MatchStageStatus.TERMINATED);
+    }
+
+    @Test
+    void cannotTerminateFinishedStage() {
+        MatchStage stage = new MatchStage("half", new TimeBasedRule(45), 45);
+        stage.start();
+        stage.end();
+
+        assertThatThrownBy(stage::terminate)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("FINISHED");
+    }
+
+    @Test
+    void cannotTerminateTwice() {
+        MatchStage stage = new MatchStage("half", new TimeBasedRule(45), 45);
+        stage.terminate();
+
+        assertThatThrownBy(stage::terminate)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("TERMINATED");
+    }
 }

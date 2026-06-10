@@ -123,7 +123,7 @@ public final class TournamentOrchestrator {
         Match match = requireMatch(matchId);
         match.processAction(action);
         applyDisciplinaryRegistry(action);
-        if (match.getStatus() == MatchStatus.FINISHED) {
+        if (isConcluded(match.getStatus())) {
             finalizeMatch(match);
         }
     }
@@ -131,9 +131,19 @@ public final class TournamentOrchestrator {
     public void endCurrentPeriod(UUID matchId) {
         Match match = requireMatch(matchId);
         match.endCurrentStage();
-        if (match.getStatus() == MatchStatus.FINISHED) {
+        if (isConcluded(match.getStatus())) {
             finalizeMatch(match);
         }
+    }
+
+    public void terminateMatch(UUID matchId) {
+        Match match = requireMatch(matchId);
+        match.terminate();
+        finalizeMatch(match);
+    }
+
+    private static boolean isConcluded(MatchStatus status) {
+        return status == MatchStatus.FINISHED || status == MatchStatus.TERMINATED;
     }
 
     public void disqualify(UUID competitorId) {

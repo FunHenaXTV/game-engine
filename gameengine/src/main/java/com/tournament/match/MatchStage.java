@@ -75,4 +75,12 @@ public final class MatchStage {
         }
         status = MatchStageStatus.FINISHED;
     }
+
+    public void terminate() {
+        if (status != MatchStageStatus.PLANNED && status != MatchStageStatus.ACTIVE) {
+            throw new IllegalStateException(
+                    "cannot terminate MatchStage from " + status + " (expected PLANNED or ACTIVE)");
+        }
+        status = MatchStageStatus.TERMINATED;
+    }
 }
