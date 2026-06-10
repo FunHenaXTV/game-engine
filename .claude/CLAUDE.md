@@ -108,6 +108,7 @@ com.tournament
 - **No setters on value objects.** For aggregates, prefer behavior-named
   methods (`publish()`, `closeEnrollment()`, `markAsCompleted(...)`) over
   `setStatus(...)`.
+- **Deadlock Prevention:** Knockout bracket deadlocks caused by missing competitors (e.g. disqualifications) must be handled automatically using `MatchupStatus.CANCELLED` and `registerDeadFeeder` propagation rather than manual intervention (see deviation #9).
 
 ## How to use the docs
 
