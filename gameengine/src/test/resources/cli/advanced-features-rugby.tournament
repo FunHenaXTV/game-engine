@@ -1,0 +1,74 @@
+# Advanced Features Demonstration Script - Rugby Edition
+new-tournament SixNationsElite rugby
+add-stage round-robin Groups
+# Use set-policy to change the standings to knockout-progression in DRAFT state
+set-policy Groups standings knockout-progression
+
+# Create custom teams
+create-team AllBlacks
+add-player AllBlacks P1 PROP 1
+add-player AllBlacks P2 HOOKER 2
+add-player AllBlacks P3 PROP 3
+add-player AllBlacks P4 PROP 4
+add-player AllBlacks P5 PROP 5
+add-player AllBlacks P6 PROP 6
+add-player AllBlacks P7 PROP 7
+add-player AllBlacks P8 PROP 8
+add-player AllBlacks P9 SCRUM_HALF 9
+add-player AllBlacks P10 FLY_HALF 10
+add-player AllBlacks P11 FLY_HALF 11
+add-player AllBlacks P12 FLY_HALF 12
+add-player AllBlacks P13 FLY_HALF 13
+add-player AllBlacks P14 FLY_HALF 14
+add-player AllBlacks P15 FLY_HALF 15
+add-player AllBlacks Bench16 FLY_HALF 16
+register AllBlacks
+
+# Register auto-generated team
+register Wallabies
+close-registration
+publish
+
+# Show team to see roster
+show team AllBlacks
+
+start-tournament
+start-match next
+
+# Try + Conversion by specific player P10
+action try AllBlacks P10 15
+action conversion AllBlacks P10 16
+
+# Opponent scores a penalty kick
+action penalty Wallabies 30
+
+# Substitute P10 for Bench16
+substitute AllBlacks P10 Bench16 40
+
+# Action revoked - Let's do a statistical action instead since we can't guess UUID easily for script
+action knock-on Wallabies 42
+
+# Injury to P9!
+injury AllBlacks P9 2 "Concussion" 44
+
+finish-period
+
+# Show match details at half time
+show match
+
+# Second half
+action scrum-won AllBlacks P1 50
+action yellow AllBlacks P2 51
+
+# Disqualify the opponent!
+disqualify Wallabies
+
+finish-period
+
+# The match is over (or ended early by walkover depending on engine).
+# Show matches to see the walkover status
+show matches
+
+advance-stage
+show standings
+quit
