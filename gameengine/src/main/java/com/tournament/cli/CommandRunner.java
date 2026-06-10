@@ -13,12 +13,20 @@ import com.tournament.discipline.impl.RugbyDisciplinaryType;
 import com.tournament.discipline.impl.RugbyScoreType;
 import com.tournament.match.Match;
 import com.tournament.match.MatchRoster;
+import com.tournament.match.MatchStage;
 import com.tournament.match.action.DisciplinaryAction;
 import com.tournament.match.action.GameAction;
 import com.tournament.match.action.ScoreAction;
+import com.tournament.match.action.StatisticalAction;
+import com.tournament.match.action.SubstitutionAction;
+import com.tournament.match.action.InjuryAction;
+import com.tournament.match.action.RevokeAction;
+import com.tournament.discipline.impl.FootballStatisticalType;
+import com.tournament.discipline.impl.RugbyStatisticalType;
 import com.tournament.match.rules.impl.FootballGameRules;
 import com.tournament.match.rules.api.GameRules;
 import com.tournament.match.rules.impl.RugbyGameRules;
+import com.tournament.tournament.MatchupStatus;
 import com.tournament.tournament.ScoreSummary;
 import com.tournament.tournament.TableScoreSummary;
 import com.tournament.tournament.Tournament;
@@ -40,6 +48,7 @@ import java.io.PrintStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -55,6 +64,7 @@ public final class CommandRunner {
     private final Map<String, TeamBuilder.CliTeam> teams = new LinkedHashMap<>();
     private int stageSeq = 0;
     private UUID currentMatchId;
+    private UUID lastMatchId;
     private TournamentMatchup currentMatchup;
 
     public CommandRunner(PrintStream out) {
@@ -310,6 +320,7 @@ public final class CommandRunner {
         MatchRoster awayRoster = TeamBuilder.freshRoster(ctAway);
         UUID matchId = orchestrator.startMatch(matchup.getId(), homeRoster, awayRoster);
         this.currentMatchId = matchId;
+        this.lastMatchId = matchId;
         this.currentMatchup = matchup;
         out.println("match: started " + home.getName() + " vs " + away.getName()
                 + " id=" + shortener.shorten(matchId));
@@ -373,6 +384,41 @@ public final class CommandRunner {
             case "red" -> rugby
                     ? DisciplinaryAction.of(competitorId, playerId, minute, RugbyDisciplinaryType.RED_CARD)
                     : DisciplinaryAction.of(competitorId, playerId, minute, FootballDisciplinaryType.RED_CARD);
+            case "corner_kick", "corner-kick" -> {
+                if (rugby)
+                    throw new IllegalArgumentException("corner_kick is football-only");
+                yield StatisticalAction.of(competitorId, playerId, minute, FootballStatisticalType.CORNER_KICK);
+            }
+            case "offside" -> {
+                if (rugby)
+                    throw new IllegalArgumentException("offside is football-only");
+                yield StatisticalAction.of(competitorId, playerId, minute, FootballStatisticalType.OFFSIDE);
+            }
+            case "shot_on_target", "shot-on-target" -> {
+                if (rugby)
+                    throw new IllegalArgumentException("shot_on_target is football-only");
+                yield StatisticalAction.of(competitorId, playerId, minute, FootballStatisticalType.SHOT_ON_TARGET);
+            }
+            case "foul" -> {
+                if (rugby)
+                    throw new IllegalArgumentException("foul is football-only");
+                yield StatisticalAction.of(competitorId, playerId, minute, FootballStatisticalType.FOUL);
+            }
+            case "scrum_won", "scrum-won" -> {
+                if (!rugby)
+                    throw new IllegalArgumentException("scrum_won is rugby-only");
+                yield StatisticalAction.of(competitorId, playerId, minute, RugbyStatisticalType.SCRUM_WON);
+            }
+            case "lineout_won", "lineout-won" -> {
+                if (!rugby)
+                    throw new IllegalArgumentException("lineout_won is rugby-only");
+                yield StatisticalAction.of(competitorId, playerId, minute, RugbyStatisticalType.LINEOUT_WON);
+            }
+            case "knock_on", "knock-on" -> {
+                if (!rugby)
+                    throw new IllegalArgumentException("knock_on is rugby-only");
+                yield StatisticalAction.of(competitorId, playerId, minute, RugbyStatisticalType.KNOCK_ON);
+            }
             default -> throw new IllegalArgumentException("unknown action type: " + type);
         };
     }
@@ -417,8 +463,9 @@ public final class CommandRunner {
                             for (TournamentMatchup m : s.getMatchups()) {
                                 String pStr = m.getParticipants().stream()
                                         .map(this::nameOf).reduce((a, b) -> a + " vs " + b).orElse("(empty)");
+                                String matchStr = m.getMatchId().map(id -> " (match=" + shortener.shorten(id) + ")").orElse("");
                                 out.println("  " + shortener.shorten(m.getId()) + " " + pStr
-                                        + " [" + m.getStatus() + "]");
+                                        + " [" + m.getStatus() + "]" + matchStr);
                             }
                         },
                         () -> out.println("no active stage"));
@@ -431,9 +478,111 @@ public final class CommandRunner {
             case "winner" -> tournament.getResult().ifPresentOrElse(
                     this::printWinner,
                     () -> out.println("no result yet"));
+            case "match" -> showMatch(tokens);
+            case "matches" -> showMatches();
             default -> throw new IllegalArgumentException(
-                    "unknown subject: " + what + " (expected tournament|stage|standings|winner)");
+                    "unknown subject: " + what + " (expected tournament|stage|standings|winner|match|matches)");
         }
+    }
+
+    private void showMatch(String[] tokens) {
+        requireOrchestrator();
+        UUID matchId = null;
+        if (tokens.length > 2) {
+            String idToken = tokens[2];
+            Optional<UUID> resolvedOpt = shortener.resolve(idToken);
+            if (resolvedOpt.isEmpty()) {
+                throw new IllegalArgumentException("unknown match or matchup ID: " + idToken);
+            }
+            UUID resolved = resolvedOpt.get();
+            if (orchestrator.findMatch(resolved).isPresent()) {
+                matchId = resolved;
+            } else {
+                TournamentMatchup matchup = findMatchupById(resolved);
+                if (matchup != null) {
+                    if (matchup.getMatchId().isPresent()) {
+                        matchId = matchup.getMatchId().get();
+                    } else {
+                        throw new IllegalArgumentException("matchup " + idToken + " does not have an active or finished match");
+                    }
+                }
+            }
+            if (matchId == null) {
+                throw new IllegalArgumentException("ID " + idToken + " is neither a known match nor a matchup ID");
+            }
+        } else {
+            matchId = currentMatchId != null ? currentMatchId : lastMatchId;
+        }
+
+        if (matchId == null) {
+            out.println("no match has been started yet");
+            return;
+        }
+        Match match = orchestrator.findMatch(matchId).orElseThrow();
+        Competitor home = competitorById(match.getCompetitorIds().get(0));
+        Competitor away = competitorById(match.getCompetitorIds().get(1));
+        out.println("match: " + home.getName() + " vs " + away.getName() + " [" + match.getStatus() + "] id=" + shortener.shorten(match.getId()));
+        out.println("score: " + match.getScore(home.getId()) + " - " + match.getScore(away.getId()));
+        out.println("events:");
+        for (MatchStage period : match.getPeriods()) {
+            out.println("  period: " + period.getName() + " [" + period.getStatus() + "]");
+            for (GameAction action : period.getActions()) {
+                String actDesc = formatAction(action, match);
+                out.println("    " + action.minute() + "' " + actDesc);
+            }
+        }
+    }
+
+    private void showMatches() {
+        requireOrchestrator();
+        out.println("matches in tournament:");
+        for (TournamentStage stage : tournament.getStages()) {
+            out.println("  stage: " + stage.getName());
+            for (TournamentMatchup m : stage.getMatchups()) {
+                String pStr = m.getParticipants().stream()
+                        .map(this::nameOf).reduce((a, b) -> a + " vs " + b).orElse("(empty)");
+                String matchDetail = "";
+                if (m.getMatchId().isPresent()) {
+                    UUID mId = m.getMatchId().get();
+                    Match match = orchestrator.findMatch(mId).orElse(null);
+                    if (match != null) {
+                        Competitor home = competitorById(match.getCompetitorIds().get(0));
+                        Competitor away = competitorById(match.getCompetitorIds().get(1));
+                        matchDetail = String.format(" — score: %d-%d [%s] (match=%s)",
+                                match.getScore(home.getId()), match.getScore(away.getId()),
+                                match.getStatus(), shortener.shorten(mId));
+                    }
+                } else if (m.getStatus() == MatchupStatus.WALKOVER) {
+                    matchDetail = " — WALKOVER";
+                }
+                out.println("    " + shortener.shorten(m.getId()) + " " + pStr + " [" + m.getStatus() + "]" + matchDetail);
+            }
+        }
+    }
+
+    private TournamentMatchup findMatchupById(UUID matchupId) {
+        for (TournamentStage stage : tournament.getStages()) {
+            Optional<TournamentMatchup> opt = stage.findMatchupById(matchupId);
+            if (opt.isPresent()) {
+                return opt.get();
+            }
+        }
+        return null;
+    }
+
+    private String formatAction(GameAction action, Match match) {
+        return switch (action) {
+            case ScoreAction s -> nameOf(s.competitorId()) + " - Goal by " + match.findAthlete(s.playerId()).map(Athlete::getName).orElse("Unknown Player") + " (" + s.actionType().getName() + ")";
+            case DisciplinaryAction d -> nameOf(d.competitorId()) + " - " + d.actionType().getName() + " card to " + match.findAthlete(d.playerId()).map(Athlete::getName).orElse("Unknown Player");
+            case StatisticalAction st -> nameOf(st.competitorId()) + " - " + st.actionType().getName() + " by " + match.findAthlete(st.playerId()).map(Athlete::getName).orElse("Unknown Player");
+            case SubstitutionAction sub -> {
+                String inName = match.findAthlete(sub.playerId()).map(Athlete::getName).orElse("Unknown Player");
+                String outName = match.findAthlete(sub.playerOutId()).map(Athlete::getName).orElse("Unknown Player");
+                yield nameOf(sub.competitorId()) + " - Substitution: " + inName + " in, " + outName + " out";
+            }
+            case InjuryAction inj -> nameOf(inj.competitorId()) + " - Injury: " + match.findAthlete(inj.playerId()).map(Athlete::getName).orElse("Unknown Player") + " (" + inj.description() + ", miss " + inj.matchesToMiss() + " matches)";
+            case RevokeAction r -> "Action " + shortener.shorten(r.targetActionId()) + " revoked (" + r.reason() + ")";
+        };
     }
 
     private void printStandings(TournamentStage stage) {
@@ -474,10 +623,10 @@ public final class CommandRunner {
         out.println("  start-tournament");
         out.println("  start-match next | start-match <matchup-id>");
         out.println("  action <type> <home|away|team-name> [minute]");
-        out.println("    types: goal | try | conversion | penalty | drop-goal | yellow | red");
+        out.println("    types: goal | try | conversion | penalty | drop-goal | yellow | red | corner_kick | offside | shot_on_target | foul | scrum_won | lineout_won | knock_on");
         out.println("  finish-period");
         out.println("  advance-stage");
-        out.println("  show tournament | show stage | show standings | show winner");
+        out.println("  show tournament | show stage | show standings | show winner | show match [id] | show matches");
         out.println("  help | quit");
     }
 
