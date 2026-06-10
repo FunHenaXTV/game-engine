@@ -25,6 +25,11 @@ public final class MatchCountCondition implements ExpirationCondition {
     }
 
     @Override
+    public void onMatchElapsed() {
+        decreaseMatchCount();
+    }
+
+    @Override
     public boolean isSatisfied() {
         return matchesToMiss == 0;
     }

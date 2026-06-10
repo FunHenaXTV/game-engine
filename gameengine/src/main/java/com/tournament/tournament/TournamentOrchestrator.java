@@ -1,9 +1,6 @@
 package com.tournament.tournament;
 
 import com.tournament.competitor.impl.Athlete;
-import com.tournament.competitor.api.ExpirationCondition;
-import com.tournament.competitor.impl.InjuryRestriction;
-import com.tournament.competitor.impl.MatchCountCondition;
 import com.tournament.competitor.api.Restriction;
 import com.tournament.match.Match;
 import com.tournament.match.MatchEligibilityChecker;
@@ -235,12 +232,7 @@ public final class TournamentOrchestrator {
                 continue;
             }
             for (Restriction r : new ArrayList<>(athlete.getActiveRestrictions())) {
-                if (r instanceof InjuryRestriction inj) {
-                    ExpirationCondition cond = inj.getCondition();
-                    if (cond instanceof MatchCountCondition mc) {
-                        mc.decreaseMatchCount();
-                    }
-                }
+                r.onMatchElapsed();
             }
         }
     }
