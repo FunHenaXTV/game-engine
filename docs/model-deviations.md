@@ -74,6 +74,18 @@ This document is the **single source of truth** for all architectural and design
 
 ---
 
+## 9. Dynamic Bracket Resolution (Deadlocks and Cancellations)
+* **UML / PDF Specification:** The UML specifies basic status transitions for `TournamentMatchup` (e.g. from WAITING_FOR_PARTICIPANTS to SCHEDULED) but did not address deadlock resolution when preceding matches in a knockout bracket fail to yield a winner (e.g. a disqualification creating a "hole" in the bracket).
+* **Previous Approach / Issue:** A matchup missing one participant would remain stuck in `WAITING_FOR_PARTICIPANTS` indefinitely. This caused cascading deadlocks where an entire branch of a knockout bracket could not proceed because a lower-stage match failed to supply a valid participant. 
+* **Why it didn't work / Limitations:** Knockout brackets require strict progression. If a team is disqualified or a match cannot be played, the tournament stalls unless the system can gracefully interpret the missing participant and advance the remaining valid participant (a "walkover"). 
+* **What was changed & Why:** Introduced dynamic bracket resolution:
+  - Added a `CANCELLED` status to `MatchupStatus`.
+  - Added a `deadFeeders` counter to `TournamentMatchup` to track how many preceding matchups failed to produce a winner.
+  - Implemented `registerDeadFeeder()` on `TournamentMatchup` which dynamically decides whether to resolve the matchup immediately as a `WALKOVER` (if one valid participant arrived and the other feeder is dead) or to `CANCEL` itself entirely (if both feeders are dead), propagating the cancellation down the bracket.
+  - Updated `ExpungeResultsPolicy` to explicitly `cancel()` unplayed future matchups of a disqualified team, triggering the deadlock resolution cascade safely. This keeps the bracket structurally sound while resolving the missing participant safely through dynamic "walkover" decisions without external intervention.
+
+---
+
 ## Template for New Deviations
 When adding any new deviation, please copy and paste this template at the bottom of the document and fill it out:
 
