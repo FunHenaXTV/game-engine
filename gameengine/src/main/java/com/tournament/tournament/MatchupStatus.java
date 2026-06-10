@@ -5,5 +5,6 @@ public enum MatchupStatus {
     READY_TO_START,
     IN_PROGRESS,
     COMPLETED,
-    WALKOVER
+    WALKOVER,
+    CANCELLED
 }

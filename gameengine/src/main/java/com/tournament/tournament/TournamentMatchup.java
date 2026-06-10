@@ -13,6 +13,7 @@ public final class TournamentMatchup {
     private final int slotCapacity;
     private final List<UUID> participants = new ArrayList<>();
     private MatchupStatus status = MatchupStatus.WAITING_FOR_PARTICIPANTS;
+    private int deadFeeders = 0;
     private Optional<UUID> winner = Optional.empty();
     private Optional<ScoreSummary> scoreSummary = Optional.empty();
     private Optional<UUID> matchId = Optional.empty();
@@ -86,9 +87,7 @@ public final class TournamentMatchup {
                     "matchup is full (" + slotCapacity + ")");
         }
         participants.add(competitorId);
-        if (participants.size() == slotCapacity) {
-            status = MatchupStatus.READY_TO_START;
-        }
+        checkReadyOrWalkover();
     }
 
     public void assignMatch(UUID matchId) {
@@ -111,12 +110,16 @@ public final class TournamentMatchup {
         this.winner = winnerId;
         this.scoreSummary = Optional.of(summary);
         this.status = MatchupStatus.COMPLETED;
-        winnerId.ifPresent(this::propagateToNextNode);
+        if (winnerId.isPresent()) {
+            propagateToNextNode(winnerId.get());
+        } else {
+            nextNode.ifPresent(TournamentMatchup::registerDeadFeeder);
+        }
     }
 
     public void markAsWalkover(UUID winnerId) {
         Objects.requireNonNull(winnerId, "winnerId");
-        if (status == MatchupStatus.COMPLETED || status == MatchupStatus.WALKOVER) {
+        if (status == MatchupStatus.COMPLETED || status == MatchupStatus.WALKOVER || status == MatchupStatus.CANCELLED) {
             throw new IllegalStateException(
                     "matchup already finalized in status " + status);
         }
@@ -131,5 +134,33 @@ public final class TournamentMatchup {
                 next.addParticipant(winnerId);
             }
         });
+    }
+
+    public void registerDeadFeeder() {
+        if (status == MatchupStatus.COMPLETED || status == MatchupStatus.WALKOVER || status == MatchupStatus.CANCELLED) {
+            return;
+        }
+        deadFeeders++;
+        checkReadyOrWalkover();
+    }
+
+    public void cancel() {
+        if (status == MatchupStatus.COMPLETED || status == MatchupStatus.WALKOVER || status == MatchupStatus.CANCELLED) {
+            return;
+        }
+        this.status = MatchupStatus.CANCELLED;
+        nextNode.ifPresent(TournamentMatchup::registerDeadFeeder);
+    }
+
+    private void checkReadyOrWalkover() {
+        if (participants.size() + deadFeeders == slotCapacity) {
+            if (participants.size() == 1) {
+                markAsWalkover(participants.get(0));
+            } else if (participants.size() == 0) {
+                cancel();
+            } else {
+                status = MatchupStatus.READY_TO_START;
+            }
+        }
     }
 }

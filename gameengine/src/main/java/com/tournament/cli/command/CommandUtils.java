@@ -37,14 +37,15 @@ public final class CommandUtils {
     }
 
     public static UUID resolveSide(CliContext ctx, String token) {
-        if (ctx.getCurrentMatchup() == null) {
-            throw new IllegalStateException("no current matchup");
-        }
-        if ("home".equals(token)) {
-            return ctx.getCurrentMatchup().getParticipants().get(0);
-        }
-        if ("away".equals(token)) {
-            return ctx.getCurrentMatchup().getParticipants().get(1);
+        if ("home".equals(token) || "away".equals(token)) {
+            if (ctx.getCurrentMatchup() == null) {
+                throw new IllegalStateException("no current matchup");
+            }
+            if ("home".equals(token)) {
+                return ctx.getCurrentMatchup().getParticipants().get(0);
+            } else {
+                return ctx.getCurrentMatchup().getParticipants().get(1);
+            }
         }
         TeamBuilder.CliTeam ct = ctx.getTeams().get(token);
         if (ct != null)
