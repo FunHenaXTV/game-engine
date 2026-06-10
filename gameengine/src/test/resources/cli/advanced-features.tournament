@@ -1,0 +1,71 @@
+# Advanced Features Demonstration Script
+new-tournament GrandSlam football
+add-stage round-robin Groups
+# Use set-policy to change the standings to knockout-progression in DRAFT state
+set-policy Groups standings knockout-progression
+
+# Create custom teams
+create-team AllStars
+add-player AllStars P1 GOALKEEPER 1
+add-player AllStars P2 DEFENDER 2
+add-player AllStars P3 DEFENDER 3
+add-player AllStars P4 DEFENDER 4
+add-player AllStars P5 DEFENDER 5
+add-player AllStars P6 MIDFIELDER 6
+add-player AllStars P7 MIDFIELDER 7
+add-player AllStars P8 MIDFIELDER 8
+add-player AllStars P9 FORWARD 9
+add-player AllStars P10 FORWARD 10
+add-player AllStars P11 FORWARD 11
+add-player AllStars Bench12 FORWARD 12
+register AllStars
+
+# Register auto-generated team
+register Opponents
+close-registration
+publish
+
+# Show team to see roster
+show team AllStars
+
+start-tournament
+start-match next
+
+# Score by specific player P9
+action goal AllStars P9 15
+
+# Opponent scores
+action goal Opponents 30
+
+# Substitute P9 for Bench12
+substitute AllStars P9 Bench12 40
+
+# VAR rules the opponent's goal offside! Wait, we need the action ID.
+# Since we don't know the generated ID in a script, we'll demonstrate a statistical action instead.
+# (Revoke requires a UUID, so it's hard to script blindly unless we guess the ID or the engine has a 'last' shortcut, but we'll show statistical actions).
+action offside Opponents 42
+
+# Injury to P10!
+injury AllStars P10 2 "Broken Toe" 44
+
+finish-period
+
+# Show match details at half time
+show match
+
+# Second half
+action foul AllStars P2 50
+action yellow AllStars P2 51
+
+# Disqualify the opponent!
+disqualify Opponents
+
+finish-period
+
+# The match is over (or ended early by walkover depending on engine).
+# Show matches to see the walkover status
+show matches
+
+advance-stage
+show standings
+quit
