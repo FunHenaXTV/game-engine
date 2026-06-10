@@ -27,4 +27,9 @@ public final class InjuryRestriction implements Restriction {
     public String getReason() {
         return reason;
     }
+
+    @Override
+    public void onMatchElapsed() {
+        condition.onMatchElapsed();
+    }
 }
