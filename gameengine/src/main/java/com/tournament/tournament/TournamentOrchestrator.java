@@ -5,8 +5,6 @@ import com.tournament.competitor.api.ExpirationCondition;
 import com.tournament.competitor.impl.InjuryRestriction;
 import com.tournament.competitor.impl.MatchCountCondition;
 import com.tournament.competitor.api.Restriction;
-import com.tournament.discipline.impl.FootballDisciplinaryType;
-import com.tournament.discipline.impl.RugbyDisciplinaryType;
 import com.tournament.match.Match;
 import com.tournament.match.MatchEligibilityChecker;
 import com.tournament.match.MatchResult;
@@ -204,13 +202,12 @@ public final class TournamentOrchestrator {
         if (!(action instanceof DisciplinaryAction d)) {
             return;
         }
-        boolean yellow = d.actionType() == FootballDisciplinaryType.YELLOW_CARD
-                || d.actionType() == RugbyDisciplinaryType.YELLOW_CARD;
-        if (!yellow) {
+        int penaltyPoints = d.actionType().penaltyPoints();
+        if (penaltyPoints <= 0) {
             return;
         }
         Optional<Restriction> created = tournament.getDisciplinaryRegistry()
-                .addPenaltyPoints(d.playerId(), 1);
+                .addPenaltyPoints(d.playerId(), penaltyPoints);
         created.ifPresent(restriction -> {
             Athlete a = athletes.get(d.playerId());
             if (a != null) {
