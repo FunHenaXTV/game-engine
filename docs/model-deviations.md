@@ -66,6 +66,14 @@ This document is the **single source of truth** for all architectural and design
 
 ---
 
+## 8. Early Match Termination (`MatchTerminationRule` + `TERMINATED` statuses)
+* **UML / PDF Specification:** A `Match` ends only when the last generated `MatchStage` finishes; `StageTerminationRule` governs period ends, and the match lifecycle has no notion of being stopped *mid-play* while keeping a result. The only non-natural ending is a `CANCELED` match (no result).
+* **Previous Approach / Issue:** Termination rules could only end the current period; the engine always advanced to the next period (or appended extra time / finished). There was no way to express a mercy/knockout/forfeit threshold that abandons the *entire* match, nor an operator-driven "stop the game now, score stands" action.
+* **Why it didn't work / Limitations:** Many disciplines need to end the whole contest early while preserving the current score as the official outcome (football mercy rule, a forfeit, an abandoned-but-decided game). Coupling this to `CANCELED` is wrong (that produces no result and breaks bracket promotion), and forcing the match to limp through remaining periods is both unrealistic and risks the score changing after the decisive moment.
+* **What was changed & Why:** Added a new sealed permit `MatchTerminationRule` that *decorates* a triggering `StageTerminationRule`; it is evaluated per-period like any rule but reports through a new `default boolean terminatesMatch(MatchState)` capability on `StageTerminationRule` (period-only rules inherit `false`; `CompositeRule` ORs it across children so a terminating sub-rule composes inside an `OR` alongside a normal time rule). When `terminatesMatch` holds, `Match` stops the active period and marks every remaining period `TERMINATED`, then ends in a new `MatchStatus.TERMINATED` (distinct from `FINISHED` = ran to completion and `CANCELED` = no result) with the current score as the result. A new `MatchStageStatus.TERMINATED` records stopped/abandoned periods (the richer match-stage lifecycle anticipated by deviation #3). A public `Match.terminate()` and `TournamentOrchestrator.terminateMatch(...)` expose the same path for manual termination at any point. This keeps the rule engine pure (deviation #5), preserves the open/closed split, and stays sport-universal: any discipline can opt into early termination by wrapping its threshold in `MatchTerminationRule`.
+
+---
+
 ## Template for New Deviations
 When adding any new deviation, please copy and paste this template at the bottom of the document and fill it out:
 

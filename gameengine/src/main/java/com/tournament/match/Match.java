@@ -1,10 +1,5 @@
 package com.tournament.match;
 
-import com.tournament.competitor.impl.Athlete;
-import com.tournament.discipline.Discipline;
-import com.tournament.match.action.GameAction;
-import com.tournament.match.rules.api.GameRules;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -13,6 +8,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+
+import com.tournament.competitor.impl.Athlete;
+import com.tournament.discipline.Discipline;
+import com.tournament.match.action.GameAction;
+import com.tournament.match.rules.api.GameRules;
 
 public final class Match {
 
@@ -170,9 +170,13 @@ public final class Match {
         period.recordAction(action);
         rules.processAction(this, action);
         if (status == MatchStatus.IN_PROGRESS
-                && period.getStatus() == MatchStageStatus.ACTIVE
-                && period.getTerminationRule().isMet(buildSnapshot())) {
-            endCurrentStage();
+                && period.getStatus() == MatchStageStatus.ACTIVE) {
+            MatchState snapshot = buildSnapshot();
+            if (period.getTerminationRule().terminatesMatch(snapshot)) {
+                terminate();
+            } else if (period.getTerminationRule().isMet(snapshot)) {
+                endCurrentStage();
+            }
         }
     }
 
@@ -207,6 +211,21 @@ public final class Match {
 
     private void finishMatch() {
         status = MatchStatus.FINISHED;
+        result = Optional.of(buildResult());
+    }
+
+    public void terminate() {
+        if (status != MatchStatus.IN_PROGRESS) {
+            throw new IllegalStateException(
+                    "cannot terminate match from " + status + " (expected IN_PROGRESS)");
+        }
+        for (MatchStage period : periods) {
+            if (period.getStatus() == MatchStageStatus.ACTIVE
+                    || period.getStatus() == MatchStageStatus.PLANNED) {
+                period.terminate();
+            }
+        }
+        status = MatchStatus.TERMINATED;
         result = Optional.of(buildResult());
     }
 

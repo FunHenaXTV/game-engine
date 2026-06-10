@@ -140,6 +140,7 @@ public final class CommandRunner {
             case "start-match" -> startMatch(tokens);
             case "action" -> action(tokens);
             case "finish-period" -> finishPeriod();
+            case "terminate-match" -> terminateMatch();
             case "advance-stage" -> advanceStage();
             case "show" -> show(tokens);
             case "create-team" -> createTeam(tokens);
@@ -341,9 +342,10 @@ public final class CommandRunner {
         orchestrator.submitAction(currentMatchId, action);
         out.println("action: " + type + " by " + team.team().getName() + " at " + minute + "'");
         if (orchestrator.findMatch(currentMatchId)
-                .map(m -> m.getStatus() == com.tournament.match.MatchStatus.FINISHED)
+                .map(m -> isConcluded(m.getStatus()))
                 .orElse(false)) {
-            out.println("match: finished");
+            Match m = orchestrator.findMatch(currentMatchId).orElseThrow();
+            out.println("match: " + m.getStatus().toString().toLowerCase());
             currentMatchId = null;
             currentMatchup = null;
         }
@@ -427,13 +429,26 @@ public final class CommandRunner {
         requireCurrentMatch();
         orchestrator.endCurrentPeriod(currentMatchId);
         Match match = orchestrator.findMatch(currentMatchId).orElseThrow();
-        if (match.getStatus() == com.tournament.match.MatchStatus.FINISHED) {
-            out.println("match: finished");
+        if (isConcluded(match.getStatus())) {
+            out.println("match: " + match.getStatus().toString().toLowerCase());
             currentMatchId = null;
             currentMatchup = null;
         } else {
             out.println("period: ended, now in period " + (match.getCurrentPeriodIndex() + 1));
         }
+    }
+
+    private void terminateMatch() {
+        requireCurrentMatch();
+        orchestrator.terminateMatch(currentMatchId);
+        out.println("match: terminated");
+        currentMatchId = null;
+        currentMatchup = null;
+    }
+
+    private static boolean isConcluded(com.tournament.match.MatchStatus status) {
+        return status == com.tournament.match.MatchStatus.FINISHED
+                || status == com.tournament.match.MatchStatus.TERMINATED;
     }
 
     private void advanceStage() {
@@ -625,6 +640,7 @@ public final class CommandRunner {
         out.println("  action <type> <home|away|team-name> [minute]");
         out.println("    types: goal | try | conversion | penalty | drop-goal | yellow | red | corner_kick | offside | shot_on_target | foul | scrum_won | lineout_won | knock_on");
         out.println("  finish-period");
+        out.println("  terminate-match");
         out.println("  advance-stage");
         out.println("  show tournament | show stage | show standings | show winner | show match [id] | show matches");
         out.println("  help | quit");
