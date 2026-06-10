@@ -1,16 +1,16 @@
 package com.tournament.cli;
 
-import com.tournament.competitor.Team;
-import com.tournament.competitor.Role;
-import com.tournament.competitor.Athlete;
-import com.tournament.competitor.RugbyRole;
-import com.tournament.competitor.FootballRole;
+import com.tournament.competitor.impl.Team;
+import com.tournament.competitor.api.Role;
+import com.tournament.competitor.impl.Athlete;
+import com.tournament.competitor.impl.RugbyRole;
+import com.tournament.competitor.impl.FootballRole;
 import com.tournament.competitor.TeamMember;
-import com.tournament.competitor.Competitor;
-import com.tournament.discipline.FootballDisciplinaryType;
-import com.tournament.discipline.FootballScoreType;
-import com.tournament.discipline.RugbyDisciplinaryType;
-import com.tournament.discipline.RugbyScoreType;
+import com.tournament.competitor.api.Competitor;
+import com.tournament.discipline.impl.FootballDisciplinaryType;
+import com.tournament.discipline.impl.FootballScoreType;
+import com.tournament.discipline.impl.RugbyDisciplinaryType;
+import com.tournament.discipline.impl.RugbyScoreType;
 import com.tournament.match.Match;
 import com.tournament.match.MatchRoster;
 import com.tournament.match.action.DisciplinaryAction;
