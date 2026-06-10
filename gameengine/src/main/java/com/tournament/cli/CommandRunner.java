@@ -124,6 +124,8 @@ public final class CommandRunner {
             case "finish-period" -> finishPeriod();
             case "advance-stage" -> advanceStage();
             case "show" -> show(tokens);
+            case "create-team" -> createTeam(tokens);
+            case "add-player" -> addPlayer(tokens);
             case "help" -> help();
             case "quit", "exit" -> { return false; }
             default -> throw new IllegalArgumentException("unknown command: " + cmd);
@@ -183,15 +185,68 @@ public final class CommandRunner {
         requireArgs(tokens, 2, "register <competitor-name>");
         requireTournament();
         String name = tokens[1];
-        if (teams.containsKey(name)) {
-            throw new IllegalArgumentException("team already registered: " + name);
+
+        TeamBuilder.CliTeam ct = teams.get(name);
+        if (ct != null) {
+            if (tournament.getRegistration().getCompetitors().contains(ct.team())) {
+                throw new IllegalArgumentException("team already registered: " + name);
+            }
+            tournament.getRegistration().enroll(ct.team());
+            out.println("registered manually created team: " + name + " id=" + shortener.shorten(ct.team().getId()));
+        } else {
+            ct = "rugby".equals(disciplineName)
+                    ? TeamBuilder.buildRugby(name)
+                    : TeamBuilder.buildFootball(name);
+            teams.put(name, ct);
+            tournament.getRegistration().enroll(ct.team());
+            out.println("registered auto-generated team: " + name + " id=" + shortener.shorten(ct.team().getId()));
         }
-        TeamBuilder.CliTeam ct = "rugby".equals(disciplineName)
-                ? TeamBuilder.buildRugby(name)
-                : TeamBuilder.buildFootball(name);
+    }
+
+    private void createTeam(String[] tokens) {
+        requireArgs(tokens, 2, "create-team <team-name>");
+        requireTournament();
+        String name = tokens[1];
+        if (teams.containsKey(name)) {
+            throw new IllegalArgumentException("team already exists: " + name);
+        }
+        com.tournament.competitor.Team team = new com.tournament.competitor.Team(name);
+        TeamBuilder.CliTeam ct = new TeamBuilder.CliTeam(team, new java.util.ArrayList<>(), new java.util.ArrayList<>(), "rugby".equals(disciplineName) ? 15 : 11);
         teams.put(name, ct);
-        tournament.getRegistration().enroll(ct.team());
-        out.println("registered: " + name + " id=" + shortener.shorten(ct.team().getId()));
+        out.println("team created: " + name);
+    }
+
+    private void addPlayer(String[] tokens) {
+        requireArgs(tokens, 5, "add-player <team-name> <player-name> <role> <shirt-number>");
+        String teamName = tokens[1];
+        String playerName = tokens[2];
+        String roleStr = tokens[3];
+        int shirt = Integer.parseInt(tokens[4]);
+
+        TeamBuilder.CliTeam ct = teams.get(teamName);
+        if (ct == null) throw new IllegalArgumentException("team not found: " + teamName);
+
+        com.tournament.competitor.Role role = parseRole(roleStr);
+
+        com.tournament.competitor.Athlete athlete = new com.tournament.competitor.Athlete(playerName);
+        ct.athletes().add(athlete);
+        ct.team().addMember(com.tournament.competitor.TeamMember.of(athlete, role));
+        ct.entries().add(new com.tournament.match.RosterEntry(athlete.getId(), role.name(), shirt));
+
+        if (orchestrator != null) {
+            orchestrator.registerAthlete(athlete);
+        }
+
+        out.println("added player: " + playerName + " to " + teamName + " as " + role.name() + " (#" + shirt + ")");
+    }
+
+    private com.tournament.competitor.Role parseRole(String roleStr) {
+        String u = roleStr.toUpperCase();
+        if ("rugby".equals(disciplineName)) {
+            return com.tournament.competitor.RugbyRole.valueOf(u);
+        } else {
+            return com.tournament.competitor.FootballRole.valueOf(u);
+        }
     }
 
     private void closeRegistration() {
@@ -395,6 +450,8 @@ public final class CommandRunner {
         out.println("  new-tournament <name> <football|rugby>");
         out.println("  add-stage <round-robin|knockout> <name> [promote-N]");
         out.println("  register <competitor-name>");
+        out.println("  create-team <team-name>");
+        out.println("  add-player <team-name> <player-name> <role> <shirt-number>");
         out.println("  close-registration");
         out.println("  publish");
         out.println("  start-tournament");
